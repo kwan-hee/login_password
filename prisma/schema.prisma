@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model comments {
+  id           Int       @id @default(autoincrement())
+  posting_id   Int
+  comment      String    @db.VarChar(1000)
+  user_id      Int
+  DateInserted DateTime? @default(now()) @db.DateTime(0)
+  users        users     @relation(fields: [user_id], references: [id], onUpdate: Restrict, map: "comments_ibfk_1")
+
+  @@index([user_id], map: "user_id")
+}
+
+model data_info {
+  id          Int     @id @default(autoincrement())
+  username    String? @db.VarChar(50)
+  postingType String? @db.VarChar(50)
+  user_id     Int
+  contents    String? @db.VarChar(500)
+  likes       Int
+}
+
+model images {
+  id      Int     @id @default(autoincrement())
+  user_id Int
+  url     String? @db.VarChar(100)
+}
+
+model posting_images {
+  id           Int       @id @default(autoincrement())
+  posting_id   Int
+  image_url    String?   @db.VarChar(3000)
+  DateInserted DateTime? @default(now()) @db.DateTime(0)
+}
+
+model postings {
+  id           Int       @id @default(autoincrement())
+  user_id      Int
+  contents     String?   @db.VarChar(2000)
+  DateInserted DateTime? @default(now()) @db.DateTime(0)
+  postingType  String    @db.VarChar(50)
+  likes        Int
+}
+
+model users {
+  id            Int        @id @default(autoincrement())
+  email         String     @unique(map: "email") @db.VarChar(100)
+  nickname      String?    @db.VarChar(50)
+  password      String     @db.VarChar(300)
+  profile_image String?    @db.VarChar(3000)
+  DateInserted  DateTime?  @default(now()) @db.DateTime(0)
+  comments      comments[]
+}
